@@ -123,6 +123,9 @@
     <ImageBrightness></ImageBrightness>
     <ImageContrast></ImageContrast>
     <ImageCrop></ImageCrop>
+    <ImageAutoCrop></ImageAutoCrop>
+    <ImageAutoCropReview></ImageAutoCropReview>
+    <ImageRevertAutoCrop></ImageRevertAutoCrop>
     <ImageHue></ImageHue>
     <ImageSaturation></ImageSaturation>
     <ImageSharpen></ImageSharpen>

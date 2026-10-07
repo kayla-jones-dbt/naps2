@@ -45,6 +45,9 @@ public class KeyboardShortcuts
     public string? ImageBrightness { get; set; }
     public string? ImageContrast { get; set; }
     public string? ImageCrop { get; set; }
+    public string? ImageAutoCrop { get; set; }
+    public string? ImageAutoCropReview { get; set; }
+    public string? ImageRevertAutoCrop { get; set; }
     public string? ImageHue { get; set; }
     public string? ImageSaturation { get; set; }
     public string? ImageSharpen { get; set; }
