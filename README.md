@@ -1,5 +1,7 @@
 # NAPS2 - Not Another PDF Scanner
 
+> **Modified version:** This `auto-crop` branch of [kayla-jones-dbt/naps2](https://github.com/kayla-jones-dbt/naps2) adds an **Auto Crop** feature (Image → Auto Crop, Auto Crop (Review)..., Revert Auto Crop) that detects the edges of scanned pages and cover jackets and crops away the scanner background. Changed by kayla-jones-dbt in October 2026; tested on macOS only. This is not an official NAPS2 release.
+
 <p align="center">
 <img src="https://www.naps2.com/images/naps2-desktop-win.png?1" width="400" alt="NAPS2 on Windows" /> <img src="https://www.naps2.com/images/naps2-desktop-mac.png?1" width="400" alt="NAPS2 on Mac" /> <img src="https://www.naps2.com/images/naps2-desktop-linux.png?1" width="400" alt="NAPS2 on Linux" />
   <br/>
