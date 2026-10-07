@@ -1065,4 +1065,31 @@ If your scanner doesn't support "Duplex" scanning, follow these instructions:
   <data name="OptionKey" xml:space="preserve">
     <value>⌥</value>
   </data>
+  <data name="AutoCrop" xml:space="preserve">
+    <value>Auto Crop</value>
+  </data>
+  <data name="AutoCropReview" xml:space="preserve">
+    <value>Auto Crop (Review)...</value>
+  </data>
+  <data name="RevertAutoCrop" xml:space="preserve">
+    <value>Revert Auto Crop</value>
+  </data>
+  <data name="AutoCropReviewTitle" xml:space="preserve">
+    <value>Review Auto Crop ({0} of {1})</value>
+  </data>
+  <data name="AutoCropNoEdgesFound" xml:space="preserve">
+    <value>no page edges found</value>
+  </data>
+  <data name="AutoCroppedPages" xml:space="preserve">
+    <value>Auto cropped {0} page(s).</value>
+  </data>
+  <data name="AutoCropNoEdgesFoundPages" xml:space="preserve">
+    <value>No page edges found on {0} page(s).</value>
+  </data>
+  <data name="Skip" xml:space="preserve">
+    <value>Skip</value>
+  </data>
+  <data name="AcceptAll" xml:space="preserve">
+    <value>Accept All</value>
+  </data>
 </root>

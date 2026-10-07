@@ -504,4 +504,10 @@
   <data name="AcquiringData" xml:space="preserve">
     <value>Acquiring data...</value>
   </data>
+  <data name="AutoCropProgress" xml:space="preserve">
+    <value>Auto Crop Progress</value>
+  </data>
+  <data name="AutoCropping" xml:space="preserve">
+    <value>Auto cropping...</value>
+  </data>
 </root>

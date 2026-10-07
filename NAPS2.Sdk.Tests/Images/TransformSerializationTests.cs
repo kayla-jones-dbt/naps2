@@ -22,7 +22,8 @@ public class TransformSerializationTests : ContextualTests
             new ScaleTransform(13.1),
             new SharpenTransform(14),
             new ThumbnailTransform(15),
-            new TrueContrastTransform(16)
+            new TrueContrastTransform(16),
+            new AutoCropTransform(17, 18, 19, 20, 21, 22)
         };
 
         var doc = serializer.SerializeToXDocument(original);
@@ -39,5 +40,6 @@ public class TransformSerializationTests : ContextualTests
         Assert.True(copy[7] is SharpenTransform sht && sht.Sharpness == 14);
         Assert.True(copy[8] is ThumbnailTransform tt && tt.Size == 15);
         Assert.True(copy[9] is TrueContrastTransform tct && tct.Contrast == 16);
+        Assert.True(copy[10] is AutoCropTransform act && act.Left == 17 && act.Right == 18 && act.Top == 19 && act.Bottom == 20 && act.OriginalWidth == 21 && act.OriginalHeight == 22);
     }
 }

@@ -1219,5 +1219,17 @@ namespace NAPS2.Lang.Resources {
                 return ResourceManager.GetString("Version", resourceCulture);
             }
         }
+        
+        internal static string AutoCropProgress {
+            get {
+                return ResourceManager.GetString("AutoCropProgress", resourceCulture);
+            }
+        }
+        
+        internal static string AutoCropping {
+            get {
+                return ResourceManager.GetString("AutoCropping", resourceCulture);
+            }
+        }
     }
 }

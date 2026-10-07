@@ -92,6 +92,33 @@ public class ImageListActions
         }
     }
 
+    /// <summary>
+    /// Detects page edges and crops away the scanner background for the selected images (or the specified images).
+    /// </summary>
+    public void AutoCrop(List<UiImage>? imagesToCrop = null)
+    {
+        var images = imagesToCrop ?? (Selection ?? _imageList.Selection).ToList();
+        if (!images.Any())
+        {
+            return;
+        }
+
+        var op = _operationFactory.Create<AutoCropOperation>();
+        op.Finished += (_, _) =>
+        {
+            if (op.CroppedCount + op.NotFoundCount > 0)
+            {
+                Invoker.Current.Invoke(() => _notify.AutoCropped(op.CroppedCount, op.NotFoundCount));
+            }
+        };
+        if (op.Start(_imageList, images, new AutoCropParams { ThumbnailSize = _thumbnailController.RenderSize }))
+        {
+            _operationProgress.ShowProgress(op);
+        }
+    }
+
+    public void RevertAutoCrop() => _imageList.Mutate(new ImageListMutation.RevertAutoCrop(), Selection);
+
     public async Task RotateFlip(double angle) =>
         await _imageList.MutateAsync(new ImageListMutation.RotateFlip(angle), Selection);
 

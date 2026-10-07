@@ -170,6 +170,10 @@ public abstract class DesktopForm : EtoFormBase
                 C.ButtonMenuItem(this, Commands.Undo),
                 C.ButtonMenuItem(this, Commands.Redo),
                 new SeparatorMenuItem(),
+                C.ButtonMenuItem(this, Commands.AutoCrop),
+                C.ButtonMenuItem(this, Commands.AutoCropReview),
+                C.ButtonMenuItem(this, Commands.RevertAutoCrop),
+                new SeparatorMenuItem(),
                 C.ButtonMenuItem(this, Commands.Delete)
             ]);
         }
@@ -323,6 +327,9 @@ public abstract class DesktopForm : EtoFormBase
                 .Append(Commands.ViewImage)
                 .Separator()
                 .Append(Commands.Crop)
+                .Append(Commands.AutoCrop)
+                .Append(Commands.AutoCropReview)
+                .Append(Commands.RevertAutoCrop)
                 .Append(Commands.BrightCont)
                 .Append(Commands.HueSat)
                 .Append(Commands.BlackWhite)

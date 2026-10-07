@@ -33,6 +33,37 @@ public class DesktopSubFormController : IDesktopSubFormController
     }
 
     public void ShowCropForm() => ShowImageForm<CropForm>();
+
+    /// <summary>
+    /// Shows the detected auto crop for each selected image in turn, letting the user accept, adjust, or skip it.
+    /// </summary>
+    public void ShowAutoCropReview(Action<List<UiImage>> autoCropWithoutReview)
+    {
+        var images = Selection.ToList();
+        for (int i = 0; i < images.Count; i++)
+        {
+            if (images[i].IsDisposed) continue;
+            var form = _formFactory.Create<AutoCropReviewForm>();
+            form.Image = images[i];
+            form.SelectedImages = [images[i]];
+            form.PageNumber = i + 1;
+            form.PageCount = images.Count;
+            form.ShowModal();
+            if (form.Result == AutoCropReviewResult.Cancelled)
+            {
+                return;
+            }
+            if (form.Result == AutoCropReviewResult.AcceptedAll)
+            {
+                var remaining = images.Skip(i + 1).Where(x => !x.IsDisposed).ToList();
+                if (remaining.Count > 0)
+                {
+                    autoCropWithoutReview(remaining);
+                }
+                return;
+            }
+        }
+    }
     public void ShowBrightnessContrastForm() => ShowImageForm<BrightContForm>();
     public void ShowHueSaturationForm() => ShowImageForm<HueSatForm>();
     public void ShowBlackWhiteForm() => ShowImageForm<BlackWhiteForm>();

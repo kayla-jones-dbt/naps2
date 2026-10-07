@@ -31,4 +31,8 @@ public class StubNotify : INotify
     public void PagesReordered()
     {
     }
+
+    public void AutoCropped(int croppedCount, int notFoundCount)
+    {
+    }
 }

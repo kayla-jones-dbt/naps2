@@ -1898,5 +1898,59 @@ namespace NAPS2.Lang.Resources {
                 return ResourceManager.GetString("OptionKey", resourceCulture);
             }
         }
+        
+        internal static string AutoCrop {
+            get {
+                return ResourceManager.GetString("AutoCrop", resourceCulture);
+            }
+        }
+        
+        internal static string AutoCropReview {
+            get {
+                return ResourceManager.GetString("AutoCropReview", resourceCulture);
+            }
+        }
+        
+        internal static string RevertAutoCrop {
+            get {
+                return ResourceManager.GetString("RevertAutoCrop", resourceCulture);
+            }
+        }
+        
+        internal static string AutoCropReviewTitle {
+            get {
+                return ResourceManager.GetString("AutoCropReviewTitle", resourceCulture);
+            }
+        }
+        
+        internal static string AutoCropNoEdgesFound {
+            get {
+                return ResourceManager.GetString("AutoCropNoEdgesFound", resourceCulture);
+            }
+        }
+        
+        internal static string AutoCroppedPages {
+            get {
+                return ResourceManager.GetString("AutoCroppedPages", resourceCulture);
+            }
+        }
+        
+        internal static string AutoCropNoEdgesFoundPages {
+            get {
+                return ResourceManager.GetString("AutoCropNoEdgesFoundPages", resourceCulture);
+            }
+        }
+        
+        internal static string Skip {
+            get {
+                return ResourceManager.GetString("Skip", resourceCulture);
+            }
+        }
+        
+        internal static string AcceptAll {
+            get {
+                return ResourceManager.GetString("AcceptAll", resourceCulture);
+            }
+        }
     }
 }

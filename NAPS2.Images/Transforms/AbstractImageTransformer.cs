@@ -34,6 +34,8 @@ internal abstract class AbstractImageTransformer<TImage> where TImage : IMemoryI
                 return PerformTransform(image, rotationTransform);
             case CropTransform cropTransform:
                 return PerformTransform(image, cropTransform);
+            case AutoCropTransform autoCropTransform:
+                return PerformTransform(image, autoCropTransform.ToCropTransform());
             case ScaleTransform scaleTransform:
                 return PerformTransform(image, scaleTransform);
             case ResizeTransform resizeTransform:

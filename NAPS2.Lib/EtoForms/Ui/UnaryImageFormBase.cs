@@ -77,12 +77,27 @@ public abstract class UnaryImageFormBase(
         return result.PerformAllTransforms(Transforms);
     }
 
+    /// <summary>
+    /// Gets the transforms that this form's transforms will be applied on top of. By default this is the image's
+    /// current transforms, but a form can override it to replace an existing transform (e.g. editing an auto crop).
+    /// </summary>
+    protected virtual TransformState GetBaseTransformState(UiImage image) => image.TransformState;
+
+    /// <summary>
+    /// Called with the full-size rendered image before it's scaled down for display.
+    /// </summary>
+    protected virtual void OnImageRendered(IMemoryImage image)
+    {
+    }
+
     protected override void InitDisplayImage()
     {
-        using var imageToRender = Image.GetClonedImage();
+        using var clonedImage = Image.GetClonedImage();
+        using var imageToRender = clonedImage.WithTransformState(GetBaseTransformState(Image));
         WorkingImage = imageToRender.Render();
         RealImageWidth = WorkingImage.Width;
         RealImageHeight = WorkingImage.Height;
+        OnImageRendered(WorkingImage);
 
         if (CanScaleWorkingImage)
         {
@@ -109,10 +124,22 @@ public abstract class UnaryImageFormBase(
             firstImageThumb =
                 transformed.PerformTransform(new ThumbnailTransform(ThumbnailController.RenderSize));
         }
-        var mutation = new ImageListMutation.AddTransforms(
-            Transforms.ToList(),
-            new Dictionary<UiImage, IMemoryImage?> { [Image] = firstImageThumb });
-        ImageList.Mutate(mutation, ListSelection.From(ImagesToTransform));
+        var thumbnails = new Dictionary<UiImage, IMemoryImage?> { [Image] = firstImageThumb };
+        var images = ImagesToTransform;
+        if (images.All(img => GetBaseTransformState(img) == img.TransformState))
+        {
+            ImageList.Mutate(new ImageListMutation.AddTransforms(Transforms.ToList(), thumbnails),
+                ListSelection.From(images));
+        }
+        else
+        {
+            // Some images have transforms that are being replaced rather than added to
+            var changes = images.ToDictionary(img => img, img => (
+                before: img.TransformState,
+                after: Transforms.Aggregate(GetBaseTransformState(img), (state, t) => state.AddOrSimplify(t))));
+            ImageList.Mutate(new ImageListMutation.ReplaceTransformStates(changes, thumbnails),
+                ListSelection.From(images));
+        }
     }
 
     protected virtual void Revert()

@@ -31,6 +31,10 @@ public class CropForm : UnaryImageFormBase
     private bool _freeformAvailable;
     private bool _freeformActive;
 
+    // The auto crop the form started with (if any) and its area in pixels of the image being cropped
+    private AutoCropTransform? _initialAutoCrop;
+    private (float l, float r, float t, float b) _initialAutoCropArea;
+
     public CropForm(Naps2Config config, UiImageList imageList, ThumbnailController thumbnailController,
         ColorScheme colorScheme, IIconProvider iconProvider) :
         base(config, imageList, thumbnailController)
@@ -58,24 +62,71 @@ public class CropForm : UnaryImageFormBase
     protected override void OnPreLoad(EventArgs e)
     {
         base.OnPreLoad(e);
-        if (_lastTransform != null && _lastTransform.OriginalWidth == RealImageWidth &&
-            _lastTransform.OriginalHeight == RealImageHeight)
+        var initialCrop = GetInitialCrop();
+        if (initialCrop != null)
         {
-            _realL = _lastTransform.Left;
-            _realR = _lastTransform.Right;
-            _realT = _lastTransform.Top;
-            _realB = _lastTransform.Bottom;
-            _cropL = _realL / RealImageWidth;
-            _cropR = _realR / RealImageWidth;
-            _cropT = _realT / RealImageHeight;
-            _cropB = _realB / RealImageHeight;
+            // Start from the existing (or newly detected) auto crop so the user can adjust it
+            double xScale = RealImageWidth / (double) initialCrop.OriginalWidth;
+            double yScale = RealImageHeight / (double) initialCrop.OriginalHeight;
+            SetCrop((float) (initialCrop.Left * xScale), (float) (initialCrop.Right * xScale),
+                (float) (initialCrop.Top * yScale), (float) (initialCrop.Bottom * yScale));
+            _initialAutoCrop = initialCrop;
+            _initialAutoCropArea = (_realL, _realR, _realT, _realB);
+        }
+        else if (UseLastCrop && _lastTransform != null && _lastTransform.OriginalWidth == RealImageWidth &&
+                 _lastTransform.OriginalHeight == RealImageHeight)
+        {
+            SetCrop(_lastTransform.Left, _lastTransform.Right, _lastTransform.Top, _lastTransform.Bottom);
         }
     }
+
+    private void SetCrop(float left, float right, float top, float bottom)
+    {
+        _realL = left;
+        _realR = right;
+        _realT = top;
+        _realB = bottom;
+        _cropL = _realL / RealImageWidth;
+        _cropR = _realR / RealImageWidth;
+        _cropT = _realT / RealImageHeight;
+        _cropB = _realB / RealImageHeight;
+    }
+
+    /// <summary>
+    /// If the image's last transform is an auto crop, the crop form edits it in place: the image is shown without the
+    /// auto crop, the auto crop's area is pre-selected, and the result replaces the auto crop.
+    /// </summary>
+    protected override TransformState GetBaseTransformState(UiImage image)
+    {
+        var state = image.TransformState;
+        return AutoCropHelper.GetLastAutoCrop(state) != null
+            ? new TransformState(state.Transforms.RemoveAt(state.Transforms.Count - 1))
+            : state;
+    }
+
+    /// <summary>
+    /// Gets the crop area to start with, if any.
+    /// </summary>
+    protected virtual AutoCropTransform? GetInitialCrop() => AutoCropHelper.GetLastAutoCrop(Image.TransformState);
+
+    /// <summary>
+    /// Whether to start with the last crop area used (for images of the same size) if there's no initial crop.
+    /// </summary>
+    protected virtual bool UseLastCrop => true;
+
+    /// <summary>
+    /// Whether the result is an auto crop (which can later be reverted with "Revert Auto Crop") rather than a regular
+    /// manual crop.
+    /// </summary>
+    protected virtual bool ProducesAutoCrop => false;
 
     protected override void Apply()
     {
         base.Apply();
-        _lastTransform = (CropTransform) Transforms.Single();
+        if (Transforms.Single() is CropTransform cropTransform)
+        {
+            _lastTransform = cropTransform;
+        }
     }
 
     protected override void Revert()
@@ -89,16 +140,28 @@ public class CropForm : UnaryImageFormBase
         return WorkingImage!.Clone();
     }
 
-    protected override List<Transform> Transforms =>
-    [
-        new CropTransform(
-            (int) Math.Round(_realL),
-            (int) Math.Round(_realR),
-            (int) Math.Round(_realT),
-            (int) Math.Round(_realB),
-            RealImageWidth,
-            RealImageHeight)
-    ];
+    private bool IsInitialAutoCropUnchanged =>
+        _initialAutoCrop != null &&
+        Math.Abs(_realL - _initialAutoCropArea.l) < 0.5 && Math.Abs(_realR - _initialAutoCropArea.r) < 0.5 &&
+        Math.Abs(_realT - _initialAutoCropArea.t) < 0.5 && Math.Abs(_realB - _initialAutoCropArea.b) < 0.5;
+
+    protected override List<Transform> Transforms => [GetTransform()];
+
+    private Transform GetTransform()
+    {
+        if (IsInitialAutoCropUnchanged)
+        {
+            // If an auto crop wasn't changed, keep it as an auto crop so it can still be reverted
+            return _initialAutoCrop!;
+        }
+        int left = (int) Math.Round(_realL);
+        int right = (int) Math.Round(_realR);
+        int top = (int) Math.Round(_realT);
+        int bottom = (int) Math.Round(_realB);
+        return ProducesAutoCrop
+            ? new AutoCropTransform(left, right, top, bottom, RealImageWidth, RealImageHeight)
+            : new CropTransform(left, right, top, bottom, RealImageWidth, RealImageHeight);
+    }
 
     private void CropForm_KeyDown(object? sender, KeyEventArgs e)
     {

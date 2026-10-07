@@ -373,6 +373,30 @@ public class TransformTests : ContextualTests
     }
 
     [Fact]
+    public void AutoCrop()
+    {
+        var original = LoadImage(ImageResources.dog);
+        var expected = LoadImage(ImageResources.dog_c_5_10_15_20);
+
+        var transformed =
+            original.PerformTransform(new AutoCropTransform(10, 20, 15, 5, original.Width, original.Height));
+
+        ImageAsserts.Similar(expected, transformed, ImageAsserts.GENERAL_RMSE_THRESHOLD);
+        AssertOwnership(original, transformed);
+    }
+
+    [Fact]
+    public void AutoCropDoesNotSimplify()
+    {
+        var state = TransformState.Empty
+            .AddOrSimplify(new AutoCropTransform(10, 20, 15, 5, 100, 100))
+            .AddOrSimplify(new CropTransform(1, 2, 3, 4, 70, 80));
+
+        Assert.Equal(2, state.Transforms.Count);
+        Assert.IsType<AutoCropTransform>(state.Transforms[0]);
+    }
+
+    [Fact]
     public void CropWithDifferentOriginal()
     {
         var original = LoadImage(ImageResources.dog);

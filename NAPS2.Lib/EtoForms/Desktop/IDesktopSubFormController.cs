@@ -4,6 +4,7 @@ public interface IDesktopSubFormController
 {
     IDesktopSubFormController WithSelection(Func<ListSelection<UiImage>> selectionFunc);
     void ShowCropForm();
+    void ShowAutoCropReview(Action<List<UiImage>> autoCropWithoutReview);
     void ShowBrightnessContrastForm();
     void ShowHueSaturationForm();
     void ShowBlackWhiteForm();

@@ -31,6 +31,54 @@ public abstract class ImageListMutation : ListMutation<UiImage>
         }
     }
 
+    /// <summary>
+    /// Removes automatic crops from the selected images, leaving any other transforms.
+    /// </summary>
+    public class RevertAutoCrop : ListMutation<UiImage>
+    {
+        public override void Apply(List<UiImage> list, ref ListSelection<UiImage> selection)
+        {
+            foreach (UiImage img in selection)
+            {
+                var state = img.TransformState;
+                if (AutoCropHelper.HasAutoCrop(state))
+                {
+                    img.ReplaceTransformState(state, AutoCropHelper.WithoutAutoCrop(state));
+                }
+            }
+        }
+    }
+
+    /// <summary>
+    /// Replaces the selected images' transforms (if unchanged) with the corresponding new transforms.
+    /// </summary>
+    public class ReplaceTransformStates(
+        Dictionary<UiImage, (TransformState before, TransformState after)> changes,
+        Dictionary<UiImage, IMemoryImage?>? updatedThumbnails = null) : ListMutation<UiImage>
+    {
+        public override void Apply(List<UiImage> list, ref ListSelection<UiImage> selection)
+        {
+            foreach (UiImage img in selection)
+            {
+                if (changes.TryGetValue(img, out var change))
+                {
+                    img.ReplaceTransformState(change.before, change.after);
+                    if (updatedThumbnails?.Get(img) is { } thumbnail)
+                    {
+                        if (img.TransformState == change.after)
+                        {
+                            img.SetThumbnail(thumbnail, change.after);
+                        }
+                        else
+                        {
+                            thumbnail.Dispose();
+                        }
+                    }
+                }
+            }
+        }
+    }
+
     public class ResetTransforms : ListMutation<UiImage>
     {
         public override void Apply(List<UiImage> list, ref ListSelection<UiImage> selection)

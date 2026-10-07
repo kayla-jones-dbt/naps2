@@ -50,4 +50,9 @@ public class Notify : INotify
     {
         _notificationManager.Show(new ReorderNotification(_imageList));
     }
+
+    public void AutoCropped(int croppedCount, int notFoundCount)
+    {
+        _notificationManager.Show(new AutoCropNotification(_imageList, croppedCount, notFoundCount));
+    }
 }
